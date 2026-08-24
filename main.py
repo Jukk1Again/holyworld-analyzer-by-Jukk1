@@ -9,11 +9,11 @@ def screenshot():
         image = ImageGrab.grab()
 
         result = winocr.recognize_pil_sync(image, lang="ru-RU")
-        text = result.text.strip()
+        text = result["text"].strip()
 
         if not text:
             result = winocr.recognize_pil_sync(image, lang="en-US")
-            text = result.text.strip()
+            text = result["text"].strip()
 
         if not text:
             text = "Текст на экране не найден."
