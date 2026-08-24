@@ -1,44 +1,39 @@
 import tkinter as tk
 from tkinter import messagebox
-from datetime import datetime
+from PIL import ImageGrab
+import pytesseract
 
-def analyze():
-    messagebox.showinfo(
-        "HolyWorld Analyzer",
-        "Анализ готов.\n\n"
-        "Пока данных нет — следующим шагом добавим "
-        "анализ цен, ЗСП, яиц и Скупщика."
-    )
+
+def screenshot():
+    try:
+        image = ImageGrab.grab()
+        text = pytesseract.image_to_string(image, lang="eng+rus")
+
+        if not text.strip():
+            text = "Текст на экране не найден."
+
+        messagebox.showinfo("Результат анализа", text)
+
+    except Exception as e:
+        messagebox.showerror("Ошибка", str(e))
+
 
 root = tk.Tk()
 root.title("HolyWorld Analyzer")
-root.geometry("400x250")
+root.geometry("450x300")
 
-title = tk.Label(
+tk.Label(
     root,
     text="HolyWorld Analyzer",
     font=("Arial", 18, "bold")
-)
-title.pack(pady=25)
+).pack(pady=30)
 
-button = tk.Button(
+tk.Button(
     root,
-    text="Провести анализ",
-    command=analyze,
+    text="Сканировать экран",
+    command=screenshot,
     width=25,
     height=2
-)
-button.pack()
+).pack()
 
-time_label = tk.Label(root, text="")
-time_label.pack(pady=20)
-
-def update_time():
-    time_label.config(
-        text="Последнее открытие: " +
-             datetime.now().strftime("%H:%M:%S")
-    )
-    root.after(1000, update_time)
-
-update_time()
 root.mainloop()
