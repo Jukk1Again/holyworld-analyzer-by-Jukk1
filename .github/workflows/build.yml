@@ -1,45 +1,28 @@
-import tkinter as tk
-from tkinter import messagebox
-from PIL import ImageGrab
-import winocr
+name: Build EXE
 
+on:
+  push:
 
-def screenshot():
-    try:
-        image = ImageGrab.grab()
+jobs:
+  build:
+    runs-on: windows-latest
 
-        result = winocr.recognize_pil_sync(image, lang="ru-RU")
-        text = result.text.strip()
+    steps:
+      - uses: actions/checkout@v5
 
-        if not text:
-            result = winocr.recognize_pil_sync(image, lang="en-US")
-            text = result.text.strip()
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
 
-        if not text:
-            text = "Текст на экране не найден."
+      - name: Install dependencies
+        run: pip install pyinstaller pillow winocr
 
-        messagebox.showinfo("Результат анализа", text)
+      - name: Build
+        run: pyinstaller --onefile --windowed main.py
 
-    except Exception as e:
-        messagebox.showerror("Ошибка", str(e))
-
-
-root = tk.Tk()
-root.title("HolyWorld Analyzer")
-root.geometry("450x300")
-
-tk.Label(
-    root,
-    text="HolyWorld Analyzer",
-    font=("Arial", 18, "bold")
-).pack(pady=30)
-
-tk.Button(
-    root,
-    text="Сканировать экран",
-    command=screenshot,
-    width=25,
-    height=2
-).pack()
-
-root.mainloop()
+      - name: Upload EXE
+        uses: actions/upload-artifact@v5
+        with:
+          name: HolyWorld-Analyzer
+          path: dist/main.exe
