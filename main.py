@@ -1,15 +1,21 @@
 import tkinter as tk
 from tkinter import messagebox
 from PIL import ImageGrab
-import pytesseract
+import winocr
 
 
 def screenshot():
     try:
         image = ImageGrab.grab()
-        text = pytesseract.image_to_string(image, lang="eng+rus")
 
-        if not text.strip():
+        result = winocr.recognize_pil_sync(image, lang="ru-RU")
+        text = result.text.strip()
+
+        if not text:
+            result = winocr.recognize_pil_sync(image, lang="en-US")
+            text = result.text.strip()
+
+        if not text:
             text = "Текст на экране не найден."
 
         messagebox.showinfo("Результат анализа", text)
